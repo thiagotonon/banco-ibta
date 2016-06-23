@@ -1,15 +1,14 @@
-
 import java.util.Date;
 
 public abstract class Conta {
 
 	private int codigo;
 	protected double saldo = 0;
-	private Date dtInicio = null;
+	private Date dtCriacao = null;
 
-	public Conta(int codigo) {
+	public Conta(int codigo, Date dtCriacao) {
 		this.codigo = codigo;
-		this.dtInicio = new Date();
+		this.dtCriacao = new Date();
 	}
 
 	public double getSaldo() {
@@ -28,6 +27,10 @@ public abstract class Conta {
 		}
 	}
 
+	public void setCodigo(int codigo){
+		this.codigo = codigo;
+	}
+
 	public abstract void sacar(double valor) throws IllegalArgumentException;
 
 	public void depositar(double valor) throws IllegalArgumentException {
@@ -43,7 +46,7 @@ public abstract class Conta {
 		String out = "";
 		out += "Codigo: " + codigo;
 		out += "\nSaldo.: " + saldo;
-		out += "\nInicio: " + dtInicio;
+		out += "\nInicio: " + dtCriacao;
 		return out;
 	}
 

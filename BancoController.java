@@ -1,12 +1,12 @@
 import java.util.*;
 import java.sql.*;
 
-public class Banco {
+public class BancoController {
 
 	private String nome;
 
 	private ContaDAO contaDao = null;
-	// private ClienteDAO clienteDao = null;
+	private ClienteDAO clienteDao = null;
 
 	private Map<Integer, Conta> mapaContas = null;
 
@@ -15,7 +15,7 @@ public class Banco {
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://127.0.0.1/bancoibta";
 
-	public Banco(String nome) {
+	public BancoController(String nome) {
 		this.nome = nome;
 		this.mapaContas = new HashMap<Integer, Conta>();
 
@@ -25,7 +25,7 @@ public class Banco {
 			System.out.println("Conexao com o banco de dados aberta");
 
 			this.contaDao = new ContaDAO(conn);
-			// this.clienteDao = new ClienteDAO(conn);
+			this.clienteDao = new ClienteDAO(conn);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

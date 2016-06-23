@@ -9,13 +9,13 @@ public class Tela {
 	private JPanel pnlContaListItem = new JPanel();
 	private JFrame frame = null;
 
-	private final Banco banco;
+	private final BancoController banco;
 	private final JDialog dialog = new JDialog();
 	private final JButton btnSacar = new JButton("Sacar");
 	private final JButton btnDepositar = new JButton("Depositar");
 	private final JButton btnReajustar = new JButton("Reajustar");
 
-	public Tela(Banco banco) {
+	public Tela(BancoController banco) {
 		this.banco = banco;
 	}
 
@@ -203,7 +203,7 @@ public class Tela {
   public static void main(String[] args) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-            (new Tela(new Banco("IBTA Banco"))).show();
+            (new Tela(new BancoController("IBTA Banco"))).show();
         }
     });
   }

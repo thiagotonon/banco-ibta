@@ -2,17 +2,17 @@ import java.util.*;
 
 public class Terminal {
 
-	private Banco banco;
+	private BancoController banco;
 
 	public static void main(String[] args) {
 
-		Banco banco = new Banco("IBTA");
+		BancoController banco = new BancoController("IBTA");
 		Terminal terminal = new Terminal(banco);
 		terminal.console();
 
 	}
 
-	public Terminal(Banco banco) {
+	public Terminal(BancoController banco) {
 		this.banco = banco;
 	}
 
