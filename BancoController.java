@@ -38,11 +38,9 @@ public class BancoController {
 	public void criaConta(int tipoConta, double... limite) throws Exception {
 		Conta c = null;
 		switch (tipoConta) {
-			// conta corrente
 			case 1:
 				c = new ContaCorrente(++proximoCodigo, limite[0]);
 				break;
-			// conta poupanca
 			case 2:
 				c = new ContaPoupanca(++proximoCodigo);
 				break;
@@ -72,11 +70,12 @@ public class BancoController {
 	}
 
 	public void reajustarInvestimentos() throws Exception {
-		for (Map.Entry<Integer, Conta> entry : mapaContas.entrySet()) {
-			Conta c = entry.getValue();
+		List<Conta> contas = contaDao.list();
+		for (Conta c : contas) {
 			if (c instanceof Investimento) {
 				Investimento invest = (Investimento) c;
 				invest.reajustar();
+				contaDao.atualiza(c);
 			}
 		}
 	}

@@ -48,7 +48,7 @@ public class ContaDAO {
       String sql = "DELETE FROM conta WHERE id = ?";
       PreparedStatement stmt = conn.preparedStatement(sql);
       stmt.setInt(1, id);
-      stmt.execute();
+      stmt.executeUpdate();
     } catch (Exception e) {
       e.printStackTrace();
     }
