@@ -39,6 +39,9 @@ public class BancoController {
 			case 2:
 				c = new ContaPoupanca();
 				break;
+			case 3:
+				c = new ContaSalario();
+				break;
 			default:
 				throw new BancoException("Tipo invalido");
 		}
@@ -87,7 +90,6 @@ public class BancoController {
 	}
 
 	public Cliente buscaCliente(String nome) {
-		System.out.println(nome);
 		return clienteDao.findBy(nome);
 	}
 

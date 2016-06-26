@@ -13,7 +13,14 @@ public class ContaDAO {
 
   public void inserir(Conta conta) {
     try {
-      int tipoConta = conta instanceof ContaCorrente ? 1 : 2;
+      int tipoConta = 0;
+      if (conta instanceof ContaCorrente) {
+        tipoConta = 1;
+      } else if (conta instanceof ContaPoupanca) {
+        tipoConta = 2;
+      } else {
+        tipoConta = 3;
+      }
       String sql = "INSERT INTO conta (saldo, tipoconta_id, limite, data_criacao) VALUES (?, ?, ?, ?)";
       PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       stmt.setDouble(1, conta.getSaldo());
@@ -44,7 +51,14 @@ public class ContaDAO {
 
   public void atualiza(Conta conta) {
     try {
-      int tipoConta = conta instanceof ContaCorrente ? 1 : 2;
+      int tipoConta = 0;
+      if (conta instanceof ContaCorrente) {
+        tipoConta = 1;
+      } else if (conta instanceof ContaPoupanca) {
+        tipoConta = 2;
+      } else {
+        tipoConta = 3;
+      }
       String sql = "UPDATE conta SET saldo = ?, limite = ? WHERE id = ?";
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setDouble(1, conta.getSaldo());
@@ -89,9 +103,12 @@ public class ContaDAO {
         if (tipoConta == 1) {
           ContaCorrente corrente = new ContaCorrente(rs.getDouble("limite"));
           c = corrente;
-        } else {
+        } else if (tipoConta == 2) {
           ContaPoupanca poupanca = new ContaPoupanca();
           c = poupanca;
+        } else {
+          ContaSalario salario = new ContaSalario();
+          c = salario;
         }
 
         c.setCodigo(id);
@@ -122,9 +139,12 @@ public class ContaDAO {
         if (tipoConta == 1) {
           ContaCorrente corrente = new ContaCorrente(rs.getDouble("limite"));
           c = corrente;
-        } else {
+        } else if (tipoConta == 2) {
           ContaPoupanca poupanca = new ContaPoupanca();
           c = poupanca;
+        } else {
+          ContaSalario salario = new ContaSalario();
+          c = salario;
         }
 
         c.setCodigo(rs.getInt("id"));
@@ -155,9 +175,12 @@ public class ContaDAO {
         if (tipoConta == 1) {
           ContaCorrente corrente = new ContaCorrente(rs.getDouble("limite"));
           c = corrente;
-        } else {
+        } else if (tipoConta == 2) {
           ContaPoupanca poupanca = new ContaPoupanca();
           c = poupanca;
+        } else {
+          ContaSalario salario = new ContaSalario();
+          c = salario;
         }
 
         c.setCliente(cliente);
