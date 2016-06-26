@@ -13,24 +13,29 @@ public class ContaCorrente extends Conta {
 		this((double) 100);
 	}
 
-	public void sacar(double valor) {
+	public void sacar(double valor) throws IllegalArgumentException {
 		if ((saldo + limite) < valor) {
-			System.err.println("Saldo insuficiente: "
-			 + saldo + " (" + limite + ")");
+			throw new IllegalArgumentException("Saldo insuficiente: " + saldo + " (" + limite + ")");
+		} else if (valor <= 0) {
+			throw new IllegalArgumentException("Valor invalido: " + valor);
 		} else {
 			this.saldo -= valor;
 		}
 	}
 
-	public double getLimite() {
-		return limite;
+	public void transferir(Conta conta, double valor) throws IllegalArgumentException {
+		if (valor <= 0) {
+			throw new IllegalArgumentException("Valor invalido: " + valor);
+		} else if ((saldo + limite) < valor) {
+			throw new IllegalArgumentException("Saldo insuficiente: " + valor);
+		}
+
+		conta.saldo += valor;
+		this.saldo -= valor;
 	}
 
-	@Override
-	public String toString() {
-		String out = super.toString();
-		out += "\nLimite: " + limite;
-		return out;
+	public double getLimite() {
+		return limite;
 	}
 
 }

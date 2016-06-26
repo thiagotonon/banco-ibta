@@ -26,8 +26,10 @@ public abstract class Conta {
 	public String getTipoConta() {
 		if (this instanceof ContaCorrente) {
 			return "Conta Corrente";
-		} else {
+		} else if (this instanceof ContaPoupanca) {
 			return "Conta Poupanca";
+		} else {
+			return "Conta Salario";
 		}
 	}
 
@@ -56,25 +58,12 @@ public abstract class Conta {
 		this.saldo += valor;
 	}
 
-	public void transferir(Conta conta, double valor) throws IllegalArgumentException {
-		if (valor <= 0) {
-			throw new IllegalArgumentException("Valor invalido: " + valor);
-		} else if (saldo <= valor) {
-			throw new IllegalArgumentException("Saldo insuficiente: " + valor);
-		}
-
-		conta.saldo += valor;
-		this.saldo -= valor;
-	}
+	public abstract void transferir(Conta conta, double valor) throws IllegalArgumentException;
 
 	@Override
 	// um exemplo de sobreescrita
 	public String toString() {
-		String out = "";
-		out += "Codigo: " + codigo;
-		out += "\nSaldo.: " + saldo;
-		out += "\nInicio: " + dtCriacao;
-		return out;
+		return "Conta " + codigo + "; Saldo: " + saldo;
 	}
 
 	@Override

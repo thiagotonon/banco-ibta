@@ -80,7 +80,7 @@ public class ContaDAO {
       stmt.setDouble(1, id);
 
       System.out.println(sql);
-      ResultSet rs = stmt.executeQuery(sql);
+      ResultSet rs = stmt.executeQuery();
 
       if (rs.next()) {
         int tipoConta = rs.getInt("tipoconta_id");

@@ -13,6 +13,8 @@ public class Tela {
 
 	private final JDialog criarClienteDialog = new JDialog();
 	private final JDialog criarContaDialog = new JDialog();
+	private final JDialog novoSaqueDialog = new JDialog();
+	private final JDialog novoDepositoDialog = new JDialog();
 	private final JButton btnSacar = new JButton("Sacar");
 	private final JButton btnDepositar = new JButton("Depositar");
 	private final JButton btnReajustar = new JButton("Reajustar");
@@ -84,16 +86,45 @@ public class Tela {
 
 	btnSacar.setBounds(10, 60, 150, 25);
 	btnSacar.setEnabled(false);
+	btnSacar.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+			try {
+				novoSaqueDialog(btnSacar);
+			} catch (Exception e) {
+				showException(e);
+			}
+		}
+	});
 	pnlBotoes.add(btnSacar);
 
 	btnDepositar.setBounds(10, 90, 150, 25);
 	btnDepositar.setEnabled(false);
+	btnDepositar.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+			try {
+				novoDepositoDialog(btnDepositar);
+			} catch (Exception e) {
+				showException(e);
+			}
+		}
+	});
 	pnlBotoes.add(btnDepositar);
 
 	btnReajustar.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 			try {
-				banco.reajustarInvestimentos();
+				Conta conta = ((ContaListItem) lstContas.getSelectedValue()).getConta();
+				Cliente cliente = ((ClienteListItem) lstClientes.getSelectedValue()).getCliente();
+				banco.reajustarInvestimentos(conta);
+				refreshContas(cliente);
+				pnlContaListItem.removeAll();
+				pnlContaListItem.updateUI();
+				pnlContaListItem.repaint();
+				btnSacar.setEnabled(false);
+				btnDepositar.setEnabled(false);
+				btnReajustar.setEnabled(false);
+				btnTransferir.setEnabled(false);
+				JOptionPane.showMessageDialog(frame, "Investimento reajustado com sucesso!", "Sucesso", JOptionPane.PLAIN_MESSAGE);
 			} catch (Exception e) {
 				showException(e);
 			}
@@ -105,12 +136,11 @@ public class Tela {
 
 	btnTransferir.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-			// fazer chamada para transferencia de valor
-			// try {
-			// 	conta.transferir(c);
-			// } catch (Exception e) {
-			// 	showException(e);
-			// }
+			try {
+				novaTransferenciaDialog(btnTransferir);
+			} catch (Exception e) {
+				showException(e);
+			}
 		}
 	});
 	btnTransferir.setBounds(10, 150, 150, 25);
@@ -166,12 +196,36 @@ public class Tela {
     criarContaDialog.setVisible(true);
 	}
 
+	private void novaTransferenciaDialog(JButton btnTransferir) {
+		Window parentWindow = SwingUtilities.windowForComponent(btnTransferir);
+    criarContaDialog.setModal(true);
+    criarContaDialog.setSize(280, 150);
+    criarContaDialog.add(novaTransferenciaPanel());
+    criarContaDialog.setVisible(true);
+	}
+
 	private void criarClienteDialog(JButton btnNovoCliente) {
 		Window parentWindow = SwingUtilities.windowForComponent(btnNovoCliente);
     criarClienteDialog.setModal(true);
     criarClienteDialog.setSize(280, 120);
     criarClienteDialog.add(criarClientePanel());
     criarClienteDialog.setVisible(true);
+	}
+
+	private void novoSaqueDialog(JButton btnSacar) {
+		Window parentWindow = SwingUtilities.windowForComponent(btnSacar);
+    novoSaqueDialog.setModal(true);
+    novoSaqueDialog.setSize(280, 120);
+    novoSaqueDialog.add(criarSaquePanel());
+    novoSaqueDialog.setVisible(true);
+	}
+
+	private void novoDepositoDialog(JButton btnDepositar) {
+		Window parentWindow = SwingUtilities.windowForComponent(btnDepositar);
+    novoDepositoDialog.setModal(true);
+    novoDepositoDialog.setSize(280, 120);
+    novoDepositoDialog.add(criarDepositoPanel());
+    novoDepositoDialog.setVisible(true);
 	}
 
 	private JScrollPane criarListaContaPanel() {
@@ -189,8 +243,8 @@ public class Tela {
 
 				btnSacar.setEnabled(true);
 				btnDepositar.setEnabled(true);
-				btnReajustar.setEnabled(true);
 				btnTransferir.setEnabled(true);
+				btnReajustar.setEnabled(conta instanceof ContaPoupanca);
 
 				JLabel lblCodigo = new JLabel("Codigo: " + conta.getCodigo());
 				lblCodigo.setVisible(true);
@@ -275,7 +329,7 @@ public class Tela {
 		JLabel lblTipoConta = new JLabel("Tipo da Conta");
 		lblTipoConta.setBounds(10, 10, 100, 25);
 
-		final JComboBox comboTipoConta = new JComboBox(new String[] {"Conta Corrente", "Conta Poupanca"});
+		final JComboBox comboTipoConta = new JComboBox(new String[] {"Conta Corrente", "Conta Poupanca", "Conta Salario"});
 		comboTipoConta.setBounds(115, 10, 150, 25);
 		comboTipoConta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -324,6 +378,65 @@ public class Tela {
 		return pnlCriarConta;
 	}
 
+	private JPanel novaTransferenciaPanel() {
+		JPanel pnlNovaTransferencia = new JPanel();
+		pnlNovaTransferencia.setLayout(null);
+		pnlNovaTransferencia.setBounds(10, 210, 280, 100);
+		pnlNovaTransferencia.setBackground(Color.CYAN);
+
+		final JLabel lblValor = new JLabel("Valor");
+		lblValor.setBounds(10, 10, 100, 25);
+
+		final JTextField txtValor = new JTextField();
+		txtValor.setBounds(115, 10, 100, 25);
+
+		JLabel lblConta = new JLabel("Conta");
+		lblConta.setBounds(10, 37, 100, 25);
+
+		final JComboBox comboConta = new JComboBox(banco.listaContas().toArray());
+		comboConta.setBounds(115, 37, 150, 25);
+
+		JButton btnTransferirConfirma = new JButton("Transferir");
+		btnTransferirConfirma.setBounds(50, 75, 100, 25);
+
+		btnTransferirConfirma.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				try {
+					double valor = Double.parseDouble(txtValor.getText().trim());
+					int codigo = Integer.parseInt(comboConta.getSelectedItem().toString().split(";")[0].split(" ")[1]);
+					Conta conta = banco.buscar(codigo);
+					Cliente cliente = ((ClienteListItem) lstClientes.getSelectedValue()).getCliente();
+					Conta selectedConta = ((ContaListItem) lstContas.getSelectedValue()).getConta();
+
+					pnlContaListItem.removeAll();
+					pnlContaListItem.updateUI();
+					pnlContaListItem.repaint();
+
+					banco.transferir(selectedConta, conta, valor);
+					criarContaDialog.setVisible(false);
+					txtValor.setText("");
+					refreshContas(cliente);
+					btnSacar.setEnabled(false);
+					btnDepositar.setEnabled(false);
+					btnReajustar.setEnabled(false);
+					btnTransferir.setEnabled(false);
+
+					JOptionPane.showMessageDialog(frame, "Transferencia de R$" + valor + " para Conta " + conta.getCodigo() + " realizado com sucesso!", "Sucesso", JOptionPane.PLAIN_MESSAGE);
+				} catch (Exception e) {
+					showException(e);
+				}
+			}
+		});
+
+		pnlNovaTransferencia.add(lblConta);
+		pnlNovaTransferencia.add(comboConta);
+		pnlNovaTransferencia.add(lblValor);
+		pnlNovaTransferencia.add(txtValor);
+		pnlNovaTransferencia.add(btnTransferirConfirma);
+
+		return pnlNovaTransferencia;
+	}
+
 	private JPanel criarClientePanel(){
 		JPanel pnlCriarCliente = new JPanel();
 		pnlCriarCliente.setLayout(null);
@@ -358,6 +471,98 @@ public class Tela {
 		pnlCriarCliente.add(btnCriarClienteConfirma);
 
 		return pnlCriarCliente;
+	}
+
+	private JPanel criarSaquePanel(){
+		JPanel pnlNovoSaque = new JPanel();
+		pnlNovoSaque.setLayout(null);
+		pnlNovoSaque.setBounds(10, 210, 280, 100);
+		pnlNovoSaque.setBackground(Color.CYAN);
+
+		final JLabel lblValor = new JLabel("Valor a ser sacado: ");
+		lblValor.setBounds(10, 20, 150, 25);
+
+		final JTextField txtValor = new JTextField();
+		txtValor.setBounds(150, 20, 100, 25);
+
+		JButton btnSacarConfirma = new JButton("Sacar");
+		btnSacarConfirma.setBounds(0, 50, 100, 25);
+
+		btnSacarConfirma.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				try {
+					double valor = Double.parseDouble(txtValor.getText().trim());
+					Conta conta = ((ContaListItem) lstContas.getSelectedValue()).getConta();
+					Cliente cliente = ((ClienteListItem) lstClientes.getSelectedValue()).getCliente();
+					banco.sacar(conta, valor);
+					pnlContaListItem.removeAll();
+					pnlContaListItem.updateUI();
+					pnlContaListItem.repaint();
+					txtValor.setText("");
+					novoSaqueDialog.setVisible(false);
+					refreshContas(cliente);
+					btnSacar.setEnabled(false);
+					btnDepositar.setEnabled(false);
+					btnReajustar.setEnabled(false);
+					btnTransferir.setEnabled(false);
+					JOptionPane.showMessageDialog(frame, "Saque de R$" + valor + " realizado com sucesso!", "Sucesso", JOptionPane.PLAIN_MESSAGE);
+				} catch (Exception e) {
+					showException(e);
+				}
+			}
+		});
+
+		pnlNovoSaque.add(lblValor);
+		pnlNovoSaque.add(txtValor);
+		pnlNovoSaque.add(btnSacarConfirma);
+
+		return pnlNovoSaque;
+	}
+
+	private JPanel criarDepositoPanel(){
+		JPanel pnlNovoDeposito = new JPanel();
+		pnlNovoDeposito.setLayout(null);
+		pnlNovoDeposito.setBounds(10, 210, 280, 100);
+		pnlNovoDeposito.setBackground(Color.CYAN);
+
+		final JLabel lblValor = new JLabel("Valor a ser depositado: ");
+		lblValor.setBounds(10, 20, 150, 25);
+
+		final JTextField txtValor = new JTextField();
+		txtValor.setBounds(160, 20, 100, 25);
+
+		JButton btnDepositarConfirma = new JButton("Depositar");
+		btnDepositarConfirma.setBounds(0, 50, 100, 25);
+
+		btnDepositarConfirma.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				try {
+					double valor = Double.parseDouble(txtValor.getText().trim());
+					Conta conta = ((ContaListItem) lstContas.getSelectedValue()).getConta();
+					Cliente cliente = ((ClienteListItem) lstClientes.getSelectedValue()).getCliente();
+					banco.depositar(conta, valor);
+					pnlContaListItem.removeAll();
+					pnlContaListItem.updateUI();
+					pnlContaListItem.repaint();
+					txtValor.setText("");
+					novoDepositoDialog.setVisible(false);
+					refreshContas(cliente);
+					btnSacar.setEnabled(false);
+					btnDepositar.setEnabled(false);
+					btnReajustar.setEnabled(false);
+					btnTransferir.setEnabled(false);
+					JOptionPane.showMessageDialog(frame, "Deposito de R$" + valor + " realizado com sucesso!", "Sucesso", JOptionPane.PLAIN_MESSAGE);
+				} catch (Exception e) {
+					showException(e);
+				}
+			}
+		});
+
+		pnlNovoDeposito.add(lblValor);
+		pnlNovoDeposito.add(txtValor);
+		pnlNovoDeposito.add(btnDepositarConfirma);
+
+		return pnlNovoDeposito;
 	}
 
   public static void main(String[] args) {

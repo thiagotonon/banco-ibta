@@ -8,14 +8,15 @@ public class BancoController {
 	private ContaDAO contaDao = null;
 	private ClienteDAO clienteDao = null;
 
-	private Map<Integer, Conta> mapaContas = null;
-
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://127.0.0.1/bancoibta";
 
+	public String getNome() {
+		return nome;
+	}
+
 	public BancoController(String nome) {
 		this.nome = nome;
-		this.mapaContas = new HashMap<Integer, Conta>();
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -27,10 +28,6 @@ public class BancoController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public String getNome() {
-		return nome;
 	}
 
 	public void criaConta(Cliente cliente, int tipoConta, double... limite) throws Exception {
@@ -47,6 +44,22 @@ public class BancoController {
 		}
 		c.setCliente(cliente);
 		contaDao.inserir(c);
+	}
+
+	public void sacar(Conta conta, double valor) throws Exception {
+		conta.sacar(valor);
+		contaDao.atualiza(conta);
+	}
+
+	public void depositar(Conta conta, double valor) throws Exception {
+		conta.depositar(valor);
+		contaDao.atualiza(conta);
+	}
+
+	public void transferir(Conta conta1, Conta conta2, double valor) throws Exception {
+		conta1.transferir(conta2, valor);
+		contaDao.atualiza(conta1);
+		contaDao.atualiza(conta2);
 	}
 
 	public void criaCliente(String nome) throws Exception {
@@ -86,15 +99,10 @@ public class BancoController {
 		return clienteDao.list();
 	}
 
-	public void reajustarInvestimentos() throws Exception {
-		List<Conta> contas = contaDao.list();
-		for (Conta c : contas) {
-			if (c instanceof Investimento) {
-				Investimento invest = (Investimento) c;
-				invest.reajustar();
-				contaDao.atualiza(c);
-			}
-		}
+	public void reajustarInvestimentos(Conta c) throws Exception {
+		Investimento invest = (Investimento) c;
+		invest.reajustar();
+		contaDao.atualiza(c);
 	}
 
 }
