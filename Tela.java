@@ -22,6 +22,8 @@ public class Tela {
 	private final JButton btnNovoCliente = new JButton("Novo Cliente");
 	private final JButton btnTransferir = new JButton("Transferir");
 
+	private static JComboBox comboCliente;
+
 	public Tela(BancoController banco) {
 		this.banco = banco;
 	}
@@ -342,7 +344,12 @@ public class Tela {
 		JLabel lblCliente = new JLabel("Cliente");
 		lblCliente.setBounds(10, 64, 100, 25);
 
-		final JComboBox comboCliente = new JComboBox(banco.listaClientes().toArray());
+		DefaultComboBoxModel comboBoxCliente = new DefaultComboBoxModel();
+		for (Object o : banco.listaClientes().toArray()) {
+			comboBoxCliente.addElement(o.toString());
+		}
+
+		comboCliente = new JComboBox(comboBoxCliente);
 		comboCliente.setBounds(115, 64, 150, 25);
 
 		JButton btnCriarContaConfirma = new JButton("Criar");
@@ -351,16 +358,21 @@ public class Tela {
 		btnCriarContaConfirma.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
-					String valor = txtLimite.getText().trim();
-					int tipoConta = comboTipoConta.getSelectedIndex() + 1;
-					double limite = valor.length() == 0 ? 0 : Double.valueOf(valor);
-					Cliente cliente = banco.buscaCliente(comboCliente.getSelectedItem().toString());
-					Cliente selectedCliente = ((ClienteListItem) lstClientes.getSelectedValue()).getCliente();
+					if (comboCliente.getSelectedItem() != null) {
+						String valor = txtLimite.getText().trim();
+						int tipoConta = comboTipoConta.getSelectedIndex() + 1;
+						double limite = valor.length() == 0 ? 0 : Double.valueOf(valor);
+						Cliente cliente = banco.buscaCliente(comboCliente.getSelectedItem().toString());
+						banco.criaConta(cliente, tipoConta, limite);
+						criarContaDialog.setVisible(false);
+						txtLimite.setText("");
 
-					banco.criaConta(cliente, tipoConta, limite);
-					criarContaDialog.setVisible(false);
-					txtLimite.setText("");
-					refreshContas(selectedCliente);
+						if (lstClientes.getSelectedValue() != null) {
+							Cliente selectedCliente = ((ClienteListItem) lstClientes.getSelectedValue()).getCliente();
+							refreshContas(selectedCliente);
+						}
+
+					}
 				} catch (Exception e) {
 					showException(e);
 				}
