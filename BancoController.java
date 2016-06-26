@@ -10,8 +10,6 @@ public class BancoController {
 
 	private Map<Integer, Conta> mapaContas = null;
 
-	private int proximoCodigo = 0;
-
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://127.0.0.1/bancoibta";
 
@@ -35,19 +33,25 @@ public class BancoController {
 		return nome;
 	}
 
-	public void criaConta(int tipoConta, double... limite) throws Exception {
+	public void criaConta(Cliente cliente, int tipoConta, double... limite) throws Exception {
 		Conta c = null;
 		switch (tipoConta) {
 			case 1:
-				c = new ContaCorrente(++proximoCodigo, limite[0]);
+				c = new ContaCorrente(limite[0]);
 				break;
 			case 2:
-				c = new ContaPoupanca(++proximoCodigo);
+				c = new ContaPoupanca();
 				break;
 			default:
 				throw new BancoException("Tipo invalido");
 		}
+		c.setCliente(cliente);
 		contaDao.inserir(c);
+	}
+
+	public void criaCliente(String nome) throws Exception {
+		Cliente cliente = new Cliente(nome);
+		clienteDao.inserir(cliente);
 	}
 
 	public Conta buscar(int codigo) throws Exception {
@@ -59,14 +63,27 @@ public class BancoController {
 	}
 
 	public List listaContas(Class classe) {
-		List lista = new ArrayList<Conta>();
-		for (Map.Entry<Integer, Conta> entry : mapaContas.entrySet()) {
-			Conta c = entry.getValue();
+		List<Conta> lista = contaDao.list();
+		List<Conta> saida = new ArrayList<Conta>();
+		for (Conta c : lista) {
 			if (classe.isInstance(c)) {
-				lista.add(c);
+				saida.add(c);
 			}
 		}
-		return lista;
+		return saida;
+	}
+
+	public Cliente buscaCliente(String nome) {
+		System.out.println(nome);
+		return clienteDao.findBy(nome);
+	}
+
+	public List<Conta> listaContas(Cliente cliente) {
+		return contaDao.list(cliente);
+	}
+
+	public List<Cliente> listaClientes() {
+		return clienteDao.list();
 	}
 
 	public void reajustarInvestimentos() throws Exception {

@@ -3,11 +3,11 @@ import java.util.Date;
 public abstract class Conta {
 
 	private int codigo;
+	private Cliente cliente;
 	protected double saldo = 0;
 	private Date dtCriacao = null;
 
-	public Conta(int codigo, Date dtCriacao) {
-		this.codigo = codigo;
+	public Conta() {
 		this.dtCriacao = new Date();
 	}
 
@@ -19,6 +19,10 @@ public abstract class Conta {
 		return codigo;
 	}
 
+	public Cliente getCliente() {
+		return cliente;
+	}
+
 	public String getTipoConta() {
 		if (this instanceof ContaCorrente) {
 			return "Conta Corrente";
@@ -27,8 +31,20 @@ public abstract class Conta {
 		}
 	}
 
+	public void setDataCriacao(Date data) {
+		this.dtCriacao = data;
+	}
+
+	public void setSaldo(double saldo) {
+		this.saldo = saldo;
+	}
+
 	public void setCodigo(int codigo){
 		this.codigo = codigo;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 
 	public abstract void sacar(double valor) throws IllegalArgumentException;
@@ -38,6 +54,17 @@ public abstract class Conta {
 			throw new IllegalArgumentException("Valor invalido: " + valor);
 		}
 		this.saldo += valor;
+	}
+
+	public void transferir(Conta conta, double valor) throws IllegalArgumentException {
+		if (valor <= 0) {
+			throw new IllegalArgumentException("Valor invalido: " + valor);
+		} else if (saldo <= valor) {
+			throw new IllegalArgumentException("Saldo insuficiente: " + valor);
+		}
+
+		conta.saldo += valor;
+		this.saldo -= valor;
 	}
 
 	@Override

@@ -1,10 +1,4 @@
-
 public class ContaPoupanca extends Conta implements Investimento {
-
-	public ContaPoupanca(int codigo) {
-		super(codigo);
-	}
-
 	public void sacar(double valor) {
 		if (valor > saldo) {
 			System.err.println("Saldo insuficiente: " + saldo);
